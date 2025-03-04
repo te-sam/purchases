@@ -44,6 +44,10 @@ class CustomerNotAddedError(PurchaseException):
     status_code=status.HTTP_409_CONFLICT
     detail="Не удалось добавить покупателя"
 
+class CustomerNotFound(PurchaseException):
+    status_code=status.HTTP_404_NOT_FOUND
+    detail="Покупатель не найден"
+
 class ItemsNotAddedError(PurchaseException):
     status_code=status.HTTP_409_CONFLICT
     detail="Не удалось добавить товар"
@@ -63,4 +67,8 @@ class AccessDeniedError(PurchaseException):
 class PurchaseNotFoundError(PurchaseException):
     status_code=status.HTTP_404_NOT_FOUND
     detail="Покупка не найдена"
+
+class UserNotInPurchaseError(PurchaseException):
+    status_code=status.HTTP_404_NOT_FOUND
+    detail="Покупатель не участвует в покупке"
 

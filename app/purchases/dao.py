@@ -1,11 +1,7 @@
-from typing import List
-from sqlalchemy import func, insert, select, update
-from app.customers.models import Customers
-from app.customers.schemas import CustomersList
+
+from sqlalchemy import and_, insert, update, select, func, distinct
 from app.dao.base import BaseDAO
-from app.exceptions import AccessDeniedError, DuplicateRecordError, PurchaseNotFoundError
 from app.items.models import Items, item_shares
-from app.items.schemas import ItemCreate
 from app.purchases.models import Purchases, purchase_customers
 from app.database import async_session_maker
 from app.purchases.schemas import PurchaseCreate
@@ -56,3 +52,39 @@ class PurchaseDAO(BaseDAO):
 
             await session.commit()
             return new_purchase
+        
+
+    @classmethod
+    async def get_purchase(cls, purchase_id: int, user_id: int):
+        async with async_session_maker() as session:
+            await cls.check_purchase(purchase_id, user_id, session)
+
+            # Подзапрос для получения shares (customer_id) для каждого item
+            shares_subquery = (
+                select(distinct(item_shares.c.customer_id))
+                .where(item_shares.c.item_id == Items.id)
+                .scalar_subquery()
+            )
+
+            # Основной запрос
+            query = (
+                select(
+                    Purchases.name.label("purchase_name"),
+                    func.array_agg(distinct(purchase_customers.c.customer_id)).label("customer_ids"),
+                    func.array_agg(
+                        func.jsonb_build_object(
+                            "name", Items.name,
+                            "price", Items.price,
+                            "shares", func.array(shares_subquery)
+                        ).distinct()  # Убедимся, что элементы в массиве уникальны
+                    ).label("items")
+                )
+                .join(purchase_customers, Purchases.id == purchase_customers.c.purchase_id)
+                .join(Items, Purchases.id == Items.purchase_id)
+                .where(Purchases.id == purchase_id)
+                .group_by(Purchases.id, Purchases.name)
+            )
+
+            # Выполнение запроса
+            result = await session.execute(query)
+            return result.mappings().first()

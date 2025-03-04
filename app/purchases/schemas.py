@@ -1,13 +1,13 @@
 from pydantic import BaseModel
 from typing import Dict, List
 
-from app.items.schemas import ItemWithShares
+from app.items.schemas import ItemCreate
 
 
 class PurchaseCreate(BaseModel):
     name: str
     customer_ids: List[int]
-    items: List[ItemWithShares]
+    items: List[ItemCreate]
 
     model_config = {
         "json_schema_extra": {

@@ -36,3 +36,9 @@ async def get_customers_to_purchase(purchase_id: int, user: Users = Depends(get_
     return customers    
 
 
+# Узнать сколько пользователь должен за покупку
+@router_customers.get("/{purchase_id}/shares/{customer_id}")
+async def get_customers_share(purchase_id: int, customer_id: int, user: Users = Depends(get_current_user)):
+    amount_customer = await CustomerDAO.get_customers_share(purchase_id, customer_id, user.id)
+    return amount_customer    
+
