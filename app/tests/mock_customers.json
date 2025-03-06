@@ -1,0 +1,42 @@
+[
+    {
+        "email": "sonchous@yandex.com",
+        "name": "Соня",
+        "created_by": 1
+    },
+    {
+        "email": null,
+        "name": "Кристина",
+        "created_by": 1
+    },
+    {
+        "email": "kopatich@gmail.com",
+        "name": "Гоша",
+        "created_by": 1
+    },
+    {
+        "email": "long@gmail.com",
+        "name": "Саня",
+        "created_by": 1
+    },
+    {
+        "email": "gay@gmail.com",
+        "name": "Ильюха",
+        "created_by": 2
+    },
+    {
+        "email": "petuh@mail.ru",
+        "name": "Кирилл",
+        "created_by": 2
+    },
+    {
+        "email": "dushnila@yandex.ru",
+        "name": "Кирилл Кузнецов",
+        "created_by": 2
+    },
+    {
+        "email": null,
+        "name": "Даша",
+        "created_by": 1
+    }
+]

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Numeric, Table, Text, ForeignKey, TIMESTAMP, UniqueConstraint, func
+from sqlalchemy import CheckConstraint, Column, Integer, Numeric, Table, Text, ForeignKey, TIMESTAMP, UniqueConstraint, func
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -24,3 +24,7 @@ class Purchases(Base):
     creator = relationship("Users", back_populates="purchases")
     customers = relationship("Customers", secondary="purchase_customers", back_populates="purchases")
     items = relationship("Items", back_populates="purchase")
+
+    __table_args__ = (
+        CheckConstraint('total_amount >= 0', name='check_total_amount_positive'),
+    )

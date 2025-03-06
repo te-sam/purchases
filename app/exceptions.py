@@ -52,9 +52,13 @@ class ItemsNotAddedError(PurchaseException):
     status_code=status.HTTP_409_CONFLICT
     detail="Не удалось добавить товар"
 
-class PurchaseNotAddedError(PurchaseException):
-    status_code=status.HTTP_409_CONFLICT
+class AccessDeniedCustomersError(PurchaseException):
+    status_code=status.HTTP_403_FORBIDDEN
     detail="Не удалось добавить покупателя"
+
+class PurchaseNotAddedError(PurchaseException):
+    status_code=status.HTTP_403_FORBIDDEN
+    detail="Не удалось добавить покупку"
 
 class DuplicateRecordError(PurchaseException):
     status_code=status.HTTP_409_CONFLICT

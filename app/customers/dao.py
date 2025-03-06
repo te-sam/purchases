@@ -4,7 +4,7 @@ from app.dao.base import BaseDAO
 from app.database import async_session_maker
 from app.customers.schemas import CustomerCreate
 from app.customers.models import Customers
-from app.exceptions import CustomerNotFound, DuplicateRecordError, PurchaseNotFoundError, UserNotInPurchaseError
+from app.exceptions import AccessDeniedCustomersError, CustomerNotFound, DuplicateRecordError, PurchaseNotAddedError, PurchaseNotFoundError, UserNotInPurchaseError
 from app.purchases.models import Purchases, purchase_customers
 from app.items.models import Items, item_shares
 
@@ -32,8 +32,16 @@ class CustomerDAO(BaseDAO):
             async with session.begin():  # Используем транзакцию
                 await cls.check_purchase(purchase_id, user_id, session)
 
+                added_customers = []
+
                 for customer_id in customers:
-                    print(type(customer_id))
+                    # Запрет на добавление чужих пользователей 
+                    query = select(Customers.created_by).where(Customers.id == customer_id)
+                    result = await session.execute(query)
+                    if result.scalars().first() != user_id:
+                        raise AccessDeniedCustomersError
+                    
+                    # Проверка на дубликаты
                     query = select(purchase_customers).where(
                         purchase_customers.c.purchase_id == purchase_id,
                         purchase_customers.c.customer_id == customer_id
@@ -43,10 +51,11 @@ class CustomerDAO(BaseDAO):
                         raise DuplicateRecordError
             
                     query = insert(purchase_customers).values(purchase_id=purchase_id, customer_id=customer_id).returning(customer_id)
-                    customer = await session.execute(query)
+                    await session.execute(query)
+                    added_customers.append(customer_id)
                 await session.commit()
 
-                return customer.mappings().all()
+                return added_customers
             
 
     @classmethod
@@ -85,6 +94,7 @@ class CustomerDAO(BaseDAO):
         async with async_session_maker() as session:
             await cls.check_purchase(purchase_id, user_id, session)
 
+            # Проверка, что пользователь существует
             query = (
                 select(Customers.name)  # Выбираем имя покупателя
                 .where(Customers.id == customer_id)
@@ -96,6 +106,7 @@ class CustomerDAO(BaseDAO):
             if not customer:
                 raise CustomerNotFound
 
+            # Проверка, что пользователь участвует в покупке
             query = (
                 select(item_shares.c.customer_id)  # Выбираем customer_id из item_shares
                 .join(purchase_customers, purchase_customers.c.customer_id == item_shares.c.customer_id)  # Соединяем с purchase_customers
@@ -113,6 +124,7 @@ class CustomerDAO(BaseDAO):
             if not customer_ids:
                 raise UserNotInPurchaseError
 
+            # Выборка данных
             query = (
                 select(
                     Customers.name,  # Выбираем имя покупателя

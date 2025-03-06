@@ -31,7 +31,7 @@ async def create_new_purchase(purchase: PurchaseCreate, user: Users = Depends(ge
     
 
 @router_purchases.get("/{purchase_id}")
-async def get_purchase(purchase_id: int, user: Users = Depends(get_current_user)):
-    purchase = await PurchaseDAO.get_purchase(purchase_id, user.id)
+async def get_purchase_by_id(purchase_id: int, user: Users = Depends(get_current_user)):
+    purchase = await PurchaseDAO.get_purchase_by_id(purchase_id, user.id)
     return purchase
 

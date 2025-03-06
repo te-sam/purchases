@@ -15,20 +15,15 @@ class ItemsList(BaseModel):
             "example": {
                 "items": [
                     {
-                        "name": "Хлеб",
-                        "price": 50.99,
-                        "shares": [5,6,7,8]
+                        "name": "Колбаски",
+                        "price": 100.9,
+                        "shares": [5,6]
                     },
                     {
-                        "name": "Мясо",
-                        "price": 1000,
+                        "name": "Рулетик",
+                        "price": 80,
                         "shares": [6,7,8]
                     },
-                    {
-                        "name": "Пиво",
-                        "price": 125,
-                        "shares": [5,6]
-                    }
                 ]
             }
         }

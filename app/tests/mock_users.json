@@ -1,0 +1,12 @@
+[
+    {
+        "email": "test@test.com",
+        "name": "Колбасный мастер",
+        "hash_password": "$2b$12$ib8N/MddMjSxNs4UOF69c.KuO4CyglQHcNATYpHcKJJn5rbltYNFG"
+    },
+    {
+        "email": "art.samohwalov@yandex.ru",
+        "name": "Грандмастер",
+        "hash_password": "$2b$12$yunevNakx8PrXPdEz0Pxj.NyNc6KJZiFlAGjjcLmZ/597S2/KqIM."
+    }
+]

@@ -22,6 +22,7 @@ async def add_customer(customer: CustomerCreate, user: Users = Depends(get_curre
 @router_customers.post("/{purchase_id}", status_code=201)
 async def add_customers_to_purchase(purchase_id: int, customers_list: CustomersList, user: Users = Depends(get_current_user)):
     customers = await CustomerDAO.add_customers_to_purchase(purchase_id, customers_list.customers, user.id)
+    print(customers)
     if not customers:
         raise CustomerNotAddedError
     return {"message": "Покупатели добавлены"}
