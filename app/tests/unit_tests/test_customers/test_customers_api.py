@@ -61,7 +61,7 @@ async def test_add_customers_to_purchase(authenticated_ac: AsyncClient, purchase
         (1, 403, None),  # Нет доступа
         (2, 200, [{'purchase_name': 'Рыбалка', 'customer_names': ['Соня', 'Кристина', 'Гоша']}]),  # Успешный запрос
         (999, 404, None),  # Покупка не найдена
-        (1, 403, None),  # Нет доступа (дубликат для примера)
+        (1, 403, None),  # Нет доступа
         (6, 200, []),  # Покупка без покупателей
     ],
 )
@@ -77,10 +77,6 @@ async def test_get_customers_to_purchase(authenticated_ac: AsyncClient, purchase
     if response.status_code == 200:
         json_response = response.json()
         assert json_response == expected_response
-
-
-async def test_a():
-    assert 1 ==1
 
 
 @pytest.mark.parametrize("purchase_id, customer_id, expected_status, expected_response", [

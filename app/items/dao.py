@@ -29,9 +29,15 @@ class ItemDAO(BaseDAO):
                         price=item.price
                     ).returning(Items)  # Возвращаем всю строку
                     result = await session.execute(query)
-                    added_item = result.mappings().first()  # Преобразуем результат в словарь
-                    print(added_item)
-                    added_items.append(added_item)  # Сохраняем добавленный элемент
+                    added_item = result.scalars().first()  # Преобразуем результат в словарь
+                    added_item_dict = {
+                        "name": added_item.name,
+                        "purchase_id": added_item.purchase_id,
+                        "id": added_item.id,
+                        "price": added_item.price
+                    }
+                    added_items.append(added_item_dict)  # Сохраняем добавленный элемент
+                    # added_items.append(added_item)  # Сохраняем добавленный элемент
 
                     # Добавляем связи в item_shares через bulk insert
                     for customer_id in item.shares:
@@ -46,7 +52,7 @@ class ItemDAO(BaseDAO):
 
 
                         amount = item.price / len(item.shares)
-                        query = insert(item_shares).values({"item_id": added_item["Items"].id, "customer_id": customer_id, "amount": amount})
+                        query = insert(item_shares).values({"item_id": added_item.id, "customer_id": customer_id, "amount": amount})
                         await session.execute(query)
 
                     sum += item.price

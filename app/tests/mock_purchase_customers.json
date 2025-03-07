@@ -30,5 +30,13 @@
     {
         "purchase_id": 4,
         "customer_id": 6
+    },
+    {
+        "purchase_id": 7,
+        "customer_id": 9
+    },
+    {
+        "purchase_id": 7,
+        "customer_id": 10
     }
 ]

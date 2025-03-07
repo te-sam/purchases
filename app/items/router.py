@@ -19,4 +19,4 @@ async def add_items_to_purchase(purchase_id: int, items_list: ItemsList, user: U
     items = await ItemDAO.add_items_to_purchase(purchase_id=purchase_id, items=items_list.items, user_id=user.id)
     if not items:
         raise ItemsNotAddedError
-    return {"message": "Товары добавлены"}
+    return items

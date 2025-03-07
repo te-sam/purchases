@@ -49,8 +49,8 @@ async def test_add_items_to_purchase(
         # Проверка результата
         assert len(result) == len(expected_result)
         for added_item, expected_item in zip(result, expected_result):
-            assert added_item["Items"].name == expected_item["name"]
-            assert added_item["Items"].price == expected_item["price"]
+            assert added_item["name"] == expected_item["name"]
+            assert added_item["price"]== expected_item["price"]
 
 
         # Проверка базы данных
@@ -67,7 +67,7 @@ async def test_add_items_to_purchase(
                 query = select(item_shares).where(item_shares.c.item_id == db_item.id)
                 db_shares = (await session.execute(query)).mappings().all()
                 
-                assert len (db_shares) == len(expected_item["shares"])
+                assert len(db_shares) == len(expected_item["shares"])
 
                 for share, customer_id in zip(db_shares, expected_item["shares"]):
                     assert share.item_id == db_item.id
