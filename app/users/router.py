@@ -29,6 +29,7 @@ async def register_user(user_data: SUserRegister):
     new_user = await UserDAO.add(name=user_data.name, email=user_data.email, hash_password=hashed_password)
     if not new_user:
         raise CannotAddDataToDatabase
+    return {"id": new_user.id, "name": new_user.name, "email": new_user.email}
 
 
 @router_auth.post("/login")
@@ -47,6 +48,7 @@ async def logout_user(response: Response):
 @router_users.get("/me")
 async def read_users_me(current_user: Users = Depends(get_current_user)):
     return current_user
+
 
 @router_users.get("")
 async def get_all_users():

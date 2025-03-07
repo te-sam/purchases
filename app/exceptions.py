@@ -72,7 +72,11 @@ class PurchaseNotFoundError(PurchaseException):
     status_code=status.HTTP_404_NOT_FOUND
     detail="Покупка не найдена"
 
-class UserNotInPurchaseError(PurchaseException):
+class CustomerNotInPurchaseError(PurchaseException):
     status_code=status.HTTP_404_NOT_FOUND
     detail="Покупатель не участвует в покупке"
+
+class NoCustomersInPurchaseError(PurchaseException):
+    status_code=status.HTTP_204_NO_CONTENT
+    detail="Покупка не содержит покупателей"
 

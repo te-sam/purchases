@@ -1,6 +1,6 @@
 from sqlalchemy import insert, select
 from app.dao.base import BaseDAO
-from app.exceptions import UserNotInPurchaseError
+from app.exceptions import CustomerNotInPurchaseError
 from app.items.models import Items, item_shares
 from app.items.schemas import ItemCreate
 from app.database import async_session_maker
@@ -42,7 +42,7 @@ class ItemDAO(BaseDAO):
                         )
                         result = await session.execute(query)
                         if not result.mappings().first():
-                            raise UserNotInPurchaseError
+                            raise CustomerNotInPurchaseError
 
 
                         amount = item.price / len(item.shares)

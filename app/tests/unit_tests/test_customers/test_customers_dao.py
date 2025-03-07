@@ -4,25 +4,16 @@ from sqlalchemy import select
 from app.customers.dao import CustomerDAO
 from app.customers.models import Customers
 from app.customers.schemas import CustomerCreate
-from pydantic import EmailStr
 from app.database import async_session_maker
-from app.exceptions import AccessDeniedCustomersError, AccessDeniedError, CustomerNotFound, DuplicateRecordError, PurchaseNotFoundError, UserNotInPurchaseError
-from app.purchases.dao import PurchaseDAO, purchase_customers
+from app.exceptions import AccessDeniedCustomersError, CustomerNotFound, CustomerNotInPurchaseError, DuplicateRecordError, PurchaseNotFoundError
+from app.purchases.dao import purchase_customers
 
 
 @pytest.mark.parametrize(
     "customer_data, created_by, expected_email",
     [
-        (
-            CustomerCreate(name="Иван Иванов", email="ivan@example.com"),  # customer_data
-            1,  # created_by
-            "ivan@example.com",  # expected_email
-        ),
-        (
-            CustomerCreate(name="Петр Петров"),  # customer_data без email
-            2,  # created_by
-            None,  # expected_email
-        ),
+        (CustomerCreate(name="Иван Иванов", email="ivan@example.com"), 1, "ivan@example.com",),
+        (CustomerCreate(name="Петр Петров"), 2, None,),
     ],
 )
 async def test_add_customer(customer_data, created_by, expected_email):
@@ -50,30 +41,9 @@ async def test_add_customer(customer_data, created_by, expected_email):
 @pytest.mark.parametrize(
     "purchase_id, customers, user_id, expected_result, expect_error, error_type",
     [
-        (
-            3,  # purchase_id
-            [4, 8],  # customers
-            1,  # user_id
-            [4,8],  # expected_result
-            False,  # expect_error
-            None,  # error_type
-        ),
-        (
-            3,  # purchase_id
-            [7],  # customers (клиент не принадлежит пользователю)
-            1,  # user_id
-            None,  # expected_result
-            True,  # expect_error
-            AccessDeniedCustomersError,  # error_type
-        ),
-        (
-            3,  # purchase_id
-            [3],  # customers (дубликат)
-            1,  # user_id
-            None,  # expected_result
-            True,  # expect_error
-            DuplicateRecordError,  # error_type
-        ),
+        (3, [4, 8], 1, {"purchase_id": 3, "customers": [4, 8]}, False, None),  # Успешный случай
+        (3, [7], 1, None, True, AccessDeniedCustomersError),  # Клиент не принадлежит пользователю
+        (3, [3], 1, None, True, DuplicateRecordError),  # Дубликат клиента
     ],
 )
 async def test_add_customers_to_purchase(
@@ -108,18 +78,8 @@ async def test_add_customers_to_purchase(
 @pytest.mark.parametrize(
     "purchase_id, user_id, expected_result, expect_error",
     [
-        (
-            1,  # purchase_id
-            2,  # user_id
-            [{"purchase_name": "Бухич в бане", "customer_names": ["Ильюха", "Кирилл"]}],  # expected_result
-            False,  # expect_error
-        ),
-        (
-            999,  # purchase_id (несуществующая покупка)
-            1,  # user_id
-            None,  # expected_result
-            True,  # expect_error
-        ),
+        (1, 2, [{"purchase_name": "Бухич в бане", "customer_names": ["Ильюха", "Кирилл"]}], False),  # Успешный случай
+        (999, 1, None, True),  # Несуществующая покупка
     ],
 )
 async def test_get_customers_to_purchase(purchase_id, user_id, expected_result, expect_error, prepare_database):
@@ -150,38 +110,10 @@ async def test_get_customers_to_purchase(purchase_id, user_id, expected_result, 
 @pytest.mark.parametrize(
     "purchase_id, customer_id, user_id, expected_result, expect_error, error_type",
     [
-        (
-            1,  # purchase_id
-            5,  # customer_id
-            2,  # user_id
-            [{"name": "Ильюха", "sum": Decimal("576.12")}],  # expected_result
-            False,  # expect_error
-            None,  # error_type
-        ),
-        (
-            2,  # purchase_id
-            999,  # customer_id (несуществующий клиент)
-            1,  # user_id
-            None,  # expected_result
-            True,  # expect_error
-            CustomerNotFound,  # error_type
-        ),
-        (
-            999,  # purchase_id (несуществующая покупка)
-            2,  # customer_id
-            1,  # user_id
-            None,  # expected_result
-            True,  # expect_error
-            PurchaseNotFoundError,  # error_type
-        ),
-        (
-            2,  # purchase_id
-            8,  # customer_id (есть, но не участвует в покупке)
-            1,  # user_id
-            None,  # expected_result
-            True,  # expect_error
-            UserNotInPurchaseError,  # error_type
-        ),
+        (1, 5, 2, {"name": "Ильюха", "sum": Decimal("576.12")}, False, None),  # Успешный случай
+        (2, 999, 1, None, True, CustomerNotFound),  # Несуществующий клиент
+        (999, 2, 1, None, True, PurchaseNotFoundError),  # Несуществующая покупка
+        (2, 8, 1, None, True, CustomerNotInPurchaseError),  # Клиент не участвует в покупке
     ],
 )
 async def test_get_customers_share(purchase_id, customer_id, user_id, expected_result, expect_error, error_type):

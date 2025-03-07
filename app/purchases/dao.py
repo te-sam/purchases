@@ -42,6 +42,7 @@ class PurchaseDAO(BaseDAO):
             # Основной запрос
             query = (
                 select(
+                    Purchases.id,
                     Purchases.name.label("purchase_name"),
                     func.array_agg(distinct(purchase_customers.c.customer_id)).label("customer_ids"),
                     func.array_agg(
@@ -52,15 +53,17 @@ class PurchaseDAO(BaseDAO):
                         ).distinct()  # Убедимся, что элементы в массиве уникальны
                     ).label("items")
                 )
-                .join(purchase_customers, Purchases.id == purchase_customers.c.purchase_id)
-                .join(Items, Purchases.id == Items.purchase_id)
+                .join(Items, Purchases.id == Items.purchase_id, isouter=True)  # Сначала соединяем с Items
+                .join(purchase_customers, Purchases.id == purchase_customers.c.purchase_id, isouter=True)  # LEFT JOIN
                 .where(Purchases.id == purchase_id)
                 .group_by(Purchases.id, Purchases.name)
             )
 
             # Выполнение запроса
             result = await session.execute(query)
-            return result.mappings().first()
+            result = result.mappings().first()
+            print(result)
+            return result
 
 
     @classmethod

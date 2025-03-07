@@ -4,7 +4,7 @@ from app.dao.base import BaseDAO
 from app.database import async_session_maker
 from app.customers.schemas import CustomerCreate
 from app.customers.models import Customers
-from app.exceptions import AccessDeniedCustomersError, CustomerNotFound, DuplicateRecordError, PurchaseNotAddedError, PurchaseNotFoundError, UserNotInPurchaseError
+from app.exceptions import AccessDeniedCustomersError, CustomerNotFound, CustomerNotInPurchaseError, DuplicateRecordError, NoCustomersInPurchaseError
 from app.purchases.models import Purchases, purchase_customers
 from app.items.models import Items, item_shares
 
@@ -30,11 +30,15 @@ class CustomerDAO(BaseDAO):
     async def add_customers_to_purchase(cls, purchase_id: int, customers, user_id):
         async with async_session_maker() as session:
             async with session.begin():  # Используем транзакцию
+                if not customers:
+                    return None
+                
                 await cls.check_purchase(purchase_id, user_id, session)
 
                 added_customers = []
 
                 for customer_id in customers:
+                    print(f"id покупателя: {customer_id}")
                     # Запрет на добавление чужих пользователей 
                     query = select(Customers.created_by).where(Customers.id == customer_id)
                     result = await session.execute(query)
@@ -55,7 +59,7 @@ class CustomerDAO(BaseDAO):
                     added_customers.append(customer_id)
                 await session.commit()
 
-                return added_customers
+                return {"purchase_id": purchase_id, "customers": added_customers}
             
 
     @classmethod
@@ -78,9 +82,6 @@ class CustomerDAO(BaseDAO):
                 
                 customers = await session.execute(query)
                 result = customers.mappings().all()
-                
-                if not result:
-                    raise PurchaseNotFoundError
                 
                 return result
             except Exception as e:
@@ -122,7 +123,7 @@ class CustomerDAO(BaseDAO):
             customer_ids = result.scalars().all()
 
             if not customer_ids:
-                raise UserNotInPurchaseError
+                raise CustomerNotInPurchaseError
 
             # Выборка данных
             query = (
@@ -142,4 +143,4 @@ class CustomerDAO(BaseDAO):
 
             # Выполнение запроса
             result = await session.execute(query)
-            return result.mappings().all()
+            return result.mappings().first()

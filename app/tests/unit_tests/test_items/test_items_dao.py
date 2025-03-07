@@ -1,11 +1,10 @@
 from decimal import Decimal
 import pytest
 from sqlalchemy import select
+from app.exceptions import CustomerNotInPurchaseError
 from app.items.dao import ItemDAO
 from app.items.models import Items, item_shares
-from app.purchases.models import purchase_customers
 from app.items.schemas import ItemCreate
-from app.exceptions import UserNotInPurchaseError
 from app.database import async_session_maker
 
 
@@ -32,7 +31,7 @@ from app.database import async_session_maker
             2,  # user_id
             None,  # expected_result
             True,  # expect_error
-            UserNotInPurchaseError,  # error_type
+            CustomerNotInPurchaseError,  # error_type
         ),
     ],
 )

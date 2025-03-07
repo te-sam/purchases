@@ -35,28 +35,19 @@ async def test_add_purchase():
 @pytest.mark.parametrize(
     "purchase_id, user_id, purchase_name, customer_ids, expected_items",
     [
-        (
-            2,  # purchase_id
-            1,  # user_id
-            "Рыбалка",  # purchase_name
-            {1, 2, 3},  # customer_ids
-            [  # expected_items
-                {"name": "Пиво", "price": 580.00, "shares": {1, 2, 3}},
-                {"name": "Шашлык", "price": 1350.52, "shares": {2, 3}},
-                {"name": "Апельсиновый сок", "price": 280.99, "shares": {2}},
-            ],
-        ),
-        (
-            1,  # purchase_id
-            2,  # user_id
-            "Бухич в бане",  # purchase_name
-            {5, 6},  # customer_ids
-            [  # expected_items
-                {"name": "Водка", "price": 357.00, "shares": {5}},
-                {"name": "Сухарики", "price": 115.23, "shares": {5, 6}},
-                {"name": "Сигареты", "price": 322.99, "shares": {5, 6}},
-            ],
-        ),
+        (2, 1, "Рыбалка", {1, 2, 3}, 
+        [
+             {"name": "Пиво", "price": 580.00, "shares": {1, 2, 3}}, 
+             {"name": "Шашлык", "price": 1350.52, "shares": {2, 3}}, 
+             {"name": "Апельсиновый сок", "price": 280.99, "shares": {2}}
+        ]),  # Первый случай
+        (1, 2, "Бухич в бане", {5, 6}, 
+        [
+             {"name": "Водка", "price": 357.00, "shares": {5}}, 
+             {"name": "Сухарики", "price": 115.23, "shares": {5, 6}}, 
+             {"name": "Сигареты", "price": 322.99, "shares": {5, 6}}
+        ]
+        ),  # Второй случай
     ],
 )
 async def test_get_purchase_by_id(purchase_id, user_id, purchase_name, customer_ids, expected_items):
