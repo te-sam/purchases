@@ -72,3 +72,15 @@ async def authenticated_ac():
         })
         assert ac.cookies["purchases_access_token"]
         yield ac
+
+
+@pytest.fixture(scope="session")
+async def authenticated_ac_2():
+    "Асинхронный аутентифицированный клиент для тестирования эндпоинтов"
+    async with AsyncClient(transport=ASGITransport(app=fastapi_app), base_url="http://test") as ac:
+        await ac.post("auth/login", json={
+            "email": "funball@yandex.ru",
+            "password": "funball228",
+        })
+        assert ac.cookies["purchases_access_token"]
+        yield ac

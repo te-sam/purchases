@@ -1,5 +1,9 @@
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 import pytest
+
+from app.main import app as fastapi_app
+
+from app.exceptions import NoDataProvidedForUpdate, UserNotFound
 
 
 async def test_get_users(ac: AsyncClient):
@@ -83,3 +87,73 @@ async def test_read_users_me(ac: AsyncClient, expected_status):
         assert json_response["email"] == login_data["email"]
         assert "name" in json_response
         assert "hash_password" in json_response
+
+
+@pytest.mark.parametrize(
+    "user_id, expected_status, expected_response",
+    [
+        (4, 204, None),
+        (999, 404, {"detail": UserNotFound.detail}),
+    ],
+)
+async def test_delete_users_by_id(ac: AsyncClient, user_id: int, expected_status: int, expected_response: dict | None):
+    response = await ac.delete(f"/users/{user_id}")
+    assert response.status_code == expected_status
+
+    if expected_response:
+        assert response.json() == expected_response
+    else:
+        # Для успешного удаления проверяем, что тело ответа пустое
+        assert not response.content
+
+
+@pytest.mark.parametrize(
+    "user_id, expected_status, expected_response",
+    [
+        (2, 200, {"name": "Грандмастер", "email": "art.samohwalov@yandex.ru"}),
+        (999, 404, {"detail": UserNotFound.detail}),
+    ],
+)
+async def test_read_users_by_id(ac: AsyncClient, user_id: int, expected_status: int, expected_response: dict | None):
+    response = await ac.get(f"/users/{user_id}")
+    assert response.status_code == expected_status
+    response = response.json()
+
+    if expected_status == 200:
+        assert response["id"] == user_id
+        assert response["name"] == expected_response["name"]
+        assert response["email"] == expected_response["email"]
+    else:
+        assert response == expected_response
+
+
+async def test_delete_users_me():
+    async with AsyncClient(transport=ASGITransport(app=fastapi_app), base_url="http://test") as ac:
+        await ac.post("auth/login", json={
+            "email": "funball@yandex.ru",
+            "password": "funball228",
+        })
+        assert ac.cookies["purchases_access_token"]
+        
+        response = await ac.delete("/users/me")
+        assert response.status_code == 204
+
+
+@pytest.mark.parametrize(
+    "update_data, expected_status, expected_response_key",
+    [
+        ({"email": "test_update@test.com"}, 200, "email"),  # Меняем только email
+        ({"name": "Заядлый тестировщик"}, 200, "name"),  # Меняем только name
+        ({"email": "test_full_update@test.com", "name": "Яростный"}, 200, "email"),  # Меняем emal и name
+        ({}, 400, "detail"),  # Ничего не меняем
+    ],
+)
+async def test_update_users_me(authenticated_ac: AsyncClient, update_data: dict, expected_status: int, expected_response_key: str):
+    response = await authenticated_ac.patch("/users/me", json=update_data)
+    assert response.status_code == expected_status
+
+    if response.status_code == 200:
+        updated_user = response.json()
+        assert updated_user[expected_response_key] == update_data[expected_response_key]
+    else:
+        assert response.json()[expected_response_key] == NoDataProvidedForUpdate.detail

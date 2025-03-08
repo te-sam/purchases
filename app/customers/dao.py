@@ -162,9 +162,6 @@ class CustomerDAO(BaseDAO):
             result = await session.execute(query)
             if not result.mappings().first():
                 raise CustomerNotInPurchaseError
-            
-            query = delete(purchase_customers).where(purchase_customers.c.customer_id == customer_id, purchase_customers.c.purchase_id == purchase_id)
-            await session.execute(query)
 
             # Получить список item_id, за которые скидывается customer
             query = (
@@ -207,5 +204,9 @@ class CustomerDAO(BaseDAO):
                 )
 
                 await session.execute(query)
+
+            # Удалить покупателя из purchase_customers
+            query = delete(purchase_customers).where(purchase_customers.c.customer_id == customer_id, purchase_customers.c.purchase_id == purchase_id)
+            await session.execute(query)
             
             await session.commit()

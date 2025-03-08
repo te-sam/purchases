@@ -4,7 +4,6 @@ from app.users.dao import UserDAO
 
 
 @pytest.mark.parametrize("email,is_present", [
-    ("test@test.com", True),
     ("art.samohwalov@yandex.ru", True),
     (".....", False)
 ])

@@ -59,7 +59,7 @@ async def read_users_by_id(user_id: int):
 
 
 @router_users.get("")
-async def get_all_users():
+async def read_all_users():
     users = await UserDAO.find_all()
     return users
 
@@ -99,6 +99,7 @@ async def update_users_me(
         raise UserNotFound
 
     return updated_user
+
 
 
 

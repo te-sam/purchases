@@ -55,7 +55,6 @@ async def get_customers():
     return customers
 
 
-
 # Узнать сколько пользователь должен за покупку
 @router_customers.get("/{purchase_id}/shares/{customer_id}")
 async def get_customers_share(purchase_id: int, customer_id: int, user: Users = Depends(get_current_user)):

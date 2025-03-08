@@ -1,6 +1,6 @@
-from sqlalchemy import insert, select
+from sqlalchemy import delete, insert, select
 from app.dao.base import BaseDAO
-from app.exceptions import CustomerNotInPurchaseError
+from app.exceptions import CustomerNotInPurchaseError, ItemsNotFound
 from app.items.models import Items, item_shares
 from app.items.schemas import ItemCreate
 from app.database import async_session_maker
@@ -64,3 +64,30 @@ class ItemDAO(BaseDAO):
 
                 return added_items  # Возвращаем все добавленные элементы
             
+
+    @classmethod
+    async def delete_item_from_purchase(cls, item_id: int, purchase_id: int, user_id: int):
+        async with async_session_maker() as session:
+            await cls.check_purchase(purchase_id, user_id, session)
+
+            # Проверка, что item существует
+            query = select(Items.id).where(Items.id == item_id)
+            result = await session.execute(query)
+            if not result.mappings().first():
+                raise ItemsNotFound
+
+            # Пересчитать total_amount
+            query = select(Items.price).where(Items.id == item_id)
+            result = await session.execute(query)
+            price = result.scalar()
+            await PurchaseDAO.add_total_amount(purchase_id, -price)
+
+            # Удаление связи в item_shares
+            query = delete(item_shares).where(item_shares.c.item_id == item_id)
+            await session.execute(query)
+
+            # Удаление элемента
+            query = delete(Items).where(Items.id == item_id)
+            await session.execute(query)
+
+            await session.commit()

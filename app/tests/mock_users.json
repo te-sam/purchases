@@ -8,5 +8,25 @@
         "email": "art.samohwalov@yandex.ru",
         "name": "Грандмастер",
         "hash_password": "$2b$12$yunevNakx8PrXPdEz0Pxj.NyNc6KJZiFlAGjjcLmZ/597S2/KqIM."
+    },
+    {
+        "email": "funball@yandex.ru",
+        "name": "Копатыч",
+        "hash_password": "$2b$12$LQ07a1PTpg4JtcjNor7.ROuM7uZ9KreMFaGac.Zge0e.pxSUMM7Dy"
+    },
+    {
+        "email": "meat@mail.ru",
+        "name": "Меня удалят по id",
+        "hash_password": "$2b$12$LQ07a1PTpg4JtcjNor7.ROuM7uZ9KreMFaGac.Zge0e.pxSUMM7Dy"
+    },
+    {
+        "email": "meat2@mail.ru",
+        "name": "Меня тоже удалят по id",
+        "hash_password": "$2b$12$LQ07a1PTpg4JtcjNor7.ROuM7uZ9KreMFaGac.Zge0e.pxSUMM7Dy"
+    },
+    {
+        "email": "meat3@mail.ru",
+        "name": "Меня удалят и получат",
+        "hash_password": "$2b$12$LQ07a1PTpg4JtcjNor7.ROuM7uZ9KreMFaGac.Zge0e.pxSUMM7Dy"
     }
 ]

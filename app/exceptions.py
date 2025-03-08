@@ -17,8 +17,8 @@ class UserNotFound(PurchaseException):
     detail="Пользователь не найден"
 
 class NoDataProvidedForUpdate(PurchaseException):
-    status_code=status.HTTP_400_BAD_REQUEST,
-    detail="Нет данных для обновления",
+    status_code=status.HTTP_400_BAD_REQUEST
+    detail="Нет данных для обновления"
         
 class IncorrectEmailOrPasswordException(PurchaseException):
     status_code=status.HTTP_401_UNAUTHORIZED
@@ -58,7 +58,11 @@ class CustomerNotFound(PurchaseException):
 
 class ItemsNotAddedError(PurchaseException):
     status_code=status.HTTP_409_CONFLICT
-    detail="Не удалось добавить товар"
+    detail="Не удалось добавить товар"\
+    
+class ItemsNotFound(PurchaseException):
+    status_code=status.HTTP_404_NOT_FOUND
+    detail="Товар не найден"
 
 class AccessDeniedCustomersError(PurchaseException):
     status_code=status.HTTP_403_FORBIDDEN

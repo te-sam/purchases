@@ -35,7 +35,7 @@ async def get_purchase_by_id(purchase_id: int, user: Users = Depends(get_current
 
 @router_purchases.delete("/{purchase_id}", status_code=204)
 async def delete_purchase_by_id(purchase_id: int, user: Users = Depends(get_current_user)):
-    purchase = await PurchaseDAO.get_purchase_by_id(purchase_id, user.id)
+    purchase = await PurchaseDAO.find_one_or_none(id=purchase_id)
     if not purchase:
         raise PurchaseNotFoundError
     if purchase.created_by != user.id:

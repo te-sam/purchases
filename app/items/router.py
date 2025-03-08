@@ -20,3 +20,8 @@ async def add_items_to_purchase(purchase_id: int, items_list: ItemsList, user: U
     if not items:
         raise ItemsNotAddedError
     return items
+
+
+@router_items.delete("/{purchase_id}/{item_id}", status_code=204)
+async def delete_item_from_purchase(item_id: int, purchase_id: int, user: Users = Depends(get_current_user)):
+    await ItemDAO.delete_item_from_purchase(item_id=item_id, purchase_id=purchase_id, user_id=user.id)

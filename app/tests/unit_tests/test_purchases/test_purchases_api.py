@@ -32,3 +32,16 @@ async def test_get_purchase_by_id(authenticated_ac: AsyncClient, purchase_id, ex
         assert "purchase_name" in json_response
         assert "customer_ids" in json_response
         assert "items" in json_response
+
+
+@pytest.mark.parametrize(
+    "purchase_id, expected_status",
+    [
+        (9, 204),  # Успешное удаление
+        (999, 404),  # Покупка не найдена
+        (1, 403),  # Нет доступа к покупке
+    ],
+)
+async def test_delete_purchase_by_id(authenticated_ac: AsyncClient, purchase_id: int, expected_status: int):
+    response = await authenticated_ac.delete(f"/purchases/{purchase_id}")
+    assert response.status_code == expected_status
