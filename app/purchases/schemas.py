@@ -14,3 +14,6 @@ class PurchaseCreate(BaseModel):
             }
         }
     }
+
+class PurchaseUpdate(BaseModel):
+    name: str

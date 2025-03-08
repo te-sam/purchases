@@ -1,4 +1,4 @@
-from sqlalchemy import delete, insert, select
+from sqlalchemy import delete, insert, select, update
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.database import async_session_maker
@@ -53,6 +53,15 @@ class BaseDAO:
             query = delete(cls.model).filter_by(**filter_by)
             await session.execute(query)
             await session.commit()
+
+    
+    @classmethod
+    async def update(cls, id: int, **update_values):
+         async with async_session_maker() as session:
+            query = update(cls.model).filter_by(id=id).values(**update_values).returning(cls.model.__table__.columns)
+            result = await session.execute(query)
+            await session.commit()
+            return result.mappings().first()
 
 
     async def check_purchase(purchase_id: int, user_id: int, session):

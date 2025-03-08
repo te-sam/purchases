@@ -11,6 +11,14 @@ class PurchaseException(HTTPException):
 class UserAlreadyExistsException(PurchaseException):
     status_code=status.HTTP_409_CONFLICT
     detail="Пользователь уже существует"
+
+class UserNotFound(PurchaseException):
+    status_code=status.HTTP_404_NOT_FOUND
+    detail="Пользователь не найден"
+
+class NoDataProvidedForUpdate(PurchaseException):
+    status_code=status.HTTP_400_BAD_REQUEST,
+    detail="Нет данных для обновления",
         
 class IncorrectEmailOrPasswordException(PurchaseException):
     status_code=status.HTTP_401_UNAUTHORIZED
@@ -54,7 +62,7 @@ class ItemsNotAddedError(PurchaseException):
 
 class AccessDeniedCustomersError(PurchaseException):
     status_code=status.HTTP_403_FORBIDDEN
-    detail="Не удалось добавить покупателя"
+    detail="Нет доступа к покупателю"
 
 class PurchaseNotAddedError(PurchaseException):
     status_code=status.HTTP_403_FORBIDDEN
@@ -71,6 +79,10 @@ class AccessDeniedError(PurchaseException):
 class PurchaseNotFoundError(PurchaseException):
     status_code=status.HTTP_404_NOT_FOUND
     detail="Покупка не найдена"
+
+class PurchaseNotUpdatedError(PurchaseException):
+    status_code=status.HTTP_409_CONFLICT
+    detail="Не удалось обновить покупку"
 
 class CustomerNotInPurchaseError(PurchaseException):
     status_code=status.HTTP_404_NOT_FOUND

@@ -6,6 +6,7 @@ from app.items.dao import ItemDAO
 from app.items.models import Items, item_shares
 from app.items.schemas import ItemCreate
 from app.database import async_session_maker
+from app.purchases.models import Purchases
 
 
 @pytest.mark.parametrize(
@@ -43,6 +44,11 @@ async def test_add_items_to_purchase(
         with pytest.raises(error_type):
             await ItemDAO.add_items_to_purchase(purchase_id, items, user_id)
     else:
+        async with async_session_maker() as session:
+            # Забираем значение цены всей покупки
+            query = select(Purchases.total_amount).where(Purchases.id == purchase_id)
+            sum_before = Decimal((await session.execute(query)).scalars().first())
+
         # Успешное добавление элементов
         result = await ItemDAO.add_items_to_purchase(purchase_id, items, user_id)
 
@@ -59,10 +65,12 @@ async def test_add_items_to_purchase(
             query = select(Items).where(Items.purchase_id == purchase_id)
             db_items = (await session.execute(query)).scalars().all()
 
+            sum_purchase = 0
             assert len(db_items) == len(items)
             for db_item, expected_item in zip(db_items, expected_result):
                 assert db_item.name == expected_item["name"]
                 assert db_item.price == expected_item["price"]
+                sum_purchase += db_item.price
 
                 query = select(item_shares).where(item_shares.c.item_id == db_item.id)
                 db_shares = (await session.execute(query)).mappings().all()
@@ -73,3 +81,12 @@ async def test_add_items_to_purchase(
                     assert share.item_id == db_item.id
                     assert share.customer_id == customer_id
                     assert share.amount == expected_item["amount"]
+            
+            # Проверка обновления итоговой суммы покупки
+            query = select(Purchases.total_amount).where(Purchases.id == purchase_id)
+            sum_after = (await session.execute(query)).scalars().first()
+            assert sum_after - sum_before == sum_purchase
+
+
+async def test():
+    assert 1==1

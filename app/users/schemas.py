@@ -28,3 +28,7 @@ class SUserAuth(BaseModel):
             }
         }
     }
+
+class UserUpdate(BaseModel):
+    email: EmailStr | None = None  # Поле email (необязательное)
+    name: str | None = None        # Поле name (необязательное)

@@ -1,3 +1,4 @@
+from decimal import Decimal
 import pytest
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -75,26 +76,32 @@ async def test_get_purchase_by_id(purchase_id, user_id, purchase_name, customer_
 @pytest.mark.parametrize(
     "purchase_id, total_amount, expect_error",
     [
-        (1, 1000, False),  # Корректное значение
-        (2, -20, True),    # Отрицательное значение (ожидаем ошибку)
+        (8, 1000, False),  # Корректное значение
+        (8, -100, False),  # Корректное значение
+        (3, -20, True),    # Отрицательное значение в итоге (ожидаем ошибку)
     ],
 )
-async def test_update_total_amount(purchase_id, total_amount, expect_error):
+async def test_add_total_amount(purchase_id, total_amount, expect_error):
     if expect_error:
         # Ожидаем ошибку IntegrityError
         with pytest.raises(IntegrityError):
-            await PurchaseDAO.update_total_amount(purchase_id, total_amount)
+            await PurchaseDAO.add_total_amount(purchase_id, total_amount)
     else:
-        # Корректное обновление
-        await PurchaseDAO.update_total_amount(purchase_id, total_amount)
-
-        # Проверка базы данных
         async with async_session_maker() as session:
+            # Забираем значение цены всей покупки
+            query = select(Purchases.total_amount).where(Purchases.id == purchase_id)
+            sum_before = Decimal((await session.execute(query)).scalars().first())
+
+            # Корректное обновление
+            await PurchaseDAO.add_total_amount(purchase_id, total_amount)
+
+            # Проверка базы данных
+        
             result = await session.execute(select(Purchases).where(Purchases.id == purchase_id))
             db_purchase = result.scalars().first()
 
             assert db_purchase is not None
-            assert db_purchase.total_amount == total_amount
+            assert db_purchase.total_amount - total_amount == sum_before
 
 
 

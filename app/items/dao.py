@@ -58,7 +58,7 @@ class ItemDAO(BaseDAO):
                     sum += item.price
                 
                 # Обновляем сумму покупки
-                await PurchaseDAO.update_total_amount(purchase_id, sum)
+                await PurchaseDAO.add_total_amount(purchase_id, sum)
 
                 await session.commit()
 

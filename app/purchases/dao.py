@@ -1,4 +1,5 @@
 
+from decimal import Decimal
 from sqlalchemy import and_, insert, update, select, func, distinct
 from app.dao.base import BaseDAO
 from app.items.models import Items, item_shares
@@ -19,6 +20,7 @@ class PurchaseDAO(BaseDAO):
                 new_purchase = Purchases(
                     name=purchase_data.name,
                     created_by=created_by,
+                    total_amount=0
                 )
                 session.add(new_purchase)
                 await session.flush()  # Получаем `new_purchase.id` без коммита
@@ -67,8 +69,14 @@ class PurchaseDAO(BaseDAO):
 
 
     @classmethod
-    async def update_total_amount(cls, purchase_id: int, total_amount: float):
+    async def add_total_amount(cls, purchase_id: int, total_amount: float):
         async with async_session_maker() as session:
-            query = update(Purchases).where(Purchases.id == purchase_id).values(total_amount=total_amount)
+            query = select(Purchases.total_amount).where(Purchases.id == purchase_id)
+            result = await session.execute(query)
+            existing_amount = result.scalar()
+
+            updated_amount = Decimal(existing_amount) + Decimal(total_amount)
+
+            query = update(Purchases).where(Purchases.id == purchase_id).values(total_amount=updated_amount)
             await session.execute(query)
             await session.commit()

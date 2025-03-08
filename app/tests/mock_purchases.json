@@ -2,36 +2,49 @@
     {
         "name": "Бухич в бане",
         "created_by": 2,
-        "created_at": "2025-03-02 15:31:13.826"
+        "created_at": "2025-03-02 15:31:13.826",
+        "total_amount": 795.22
     },
     {
         "name": "Рыбалка",
         "created_by": 1,
-        "created_at": "2025-02-17 18:28:13.826"
+        "created_at": "2025-02-17 18:28:13.826",
+        "total_amount": 2211.51
     },
     {
         "name": "Поход за грибами",
         "created_by": 1,
-        "created_at": "2024-07-12 12:28:13.826"
+        "created_at": "2024-07-12 12:28:13.826",
+        "total_amount": 0
     },
     {
         "name": "День рожденья",
         "created_by": 2,
-        "created_at": "2024-12-26 23:28:13.826"
+        "created_at": "2024-12-26 23:28:13.826",
+        "total_amount": 0
     },
     {
         "name": "Посиделки на карьере",
         "created_by": 1,
-        "created_at": "2024-12-26 23:28:13.826"
+        "created_at": "2024-12-26 23:28:13.826",
+        "total_amount": 0
     },
     {
         "name": "Покупка без покупателей",
         "created_by": 1,
-        "created_at": "2024-12-26 23:28:13.826"
+        "created_at": "2024-12-26 23:28:13.826",
+        "total_amount": 0
     },
     {
         "name": "Час земли",
         "created_by": 1,
-        "created_at": "2022-03-29 20:20:13.826"
+        "created_at": "2022-03-29 20:20:13.826",
+        "total_amount": 100
+    },
+    {
+        "name": "Тут обновлено total_amount",
+        "created_by": 1,
+        "created_at": "2022-03-29 20:20:13.826",
+        "total_amount": 100
     }
 ]

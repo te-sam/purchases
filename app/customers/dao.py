@@ -1,4 +1,4 @@
-from sqlalchemy import func, insert, select
+from sqlalchemy import delete, func, insert, select, update
 from app.customers.models import Customers
 from app.dao.base import BaseDAO
 from app.database import async_session_maker
@@ -144,3 +144,68 @@ class CustomerDAO(BaseDAO):
             # Выполнение запроса
             result = await session.execute(query)
             return result.mappings().first()
+    
+    @classmethod
+    async def delete_customer_from_purchase(cls, customer_id: int, purchase_id: int, user_id: int):
+        async with async_session_maker() as session:
+            await cls.check_purchase(purchase_id, user_id, session)
+
+            # Проверка, что пользователь существует
+            query = select(Customers.name).where(Customers.id == customer_id)
+            result = await session.execute(query)
+            customer = result.scalars().first()
+            if not customer:
+                raise CustomerNotFound
+
+            # Покупатель не участвует в покупке
+            query = select(purchase_customers).where(purchase_customers.c.customer_id == customer_id, purchase_customers.c.purchase_id == purchase_id)
+            result = await session.execute(query)
+            if not result.mappings().first():
+                raise CustomerNotInPurchaseError
+            
+            query = delete(purchase_customers).where(purchase_customers.c.customer_id == customer_id, purchase_customers.c.purchase_id == purchase_id)
+            await session.execute(query)
+
+            # Получить список item_id, за которые скидывается customer
+            query = (
+                select(Items.id)
+                .join(item_shares, Items.id == item_shares.c.item_id)
+                .where(
+                    (Items.purchase_id == purchase_id) &
+                    (item_shares.c.customer_id == customer_id)
+                )
+            )
+            result = await session.execute(query)
+            item_ids = result.scalars().all()
+
+            # Удлаить все записи item_shares для покупателя, который не участвует в покупке
+            if item_ids:
+                query = delete(item_shares).where(item_shares.c.item_id.in_(item_ids), item_shares.c.customer_id == customer_id)
+                await session.execute(query)
+
+            # Пересчитать amount в item_shares
+            for item_id in item_ids:
+                customer_count_subquery = (
+                    select(func.count(item_shares.c.customer_id))
+                    .where(item_shares.c.item_id == item_id)
+                    .group_by(item_shares.c.item_id)
+                    .scalar_subquery()
+                )
+
+                # Получаем цену товара
+                item_price_query = select(Items.price).where(Items.id == item_id)
+                item_price = (await session.execute(item_price_query)).scalar()
+
+                # Рассчитываем новое значение amount
+                new_amount = item_price / customer_count_subquery
+
+                # Обновляем amount в таблице item_shares
+                query = (
+                    update(item_shares)
+                    .where(item_shares.c.item_id == item_id)
+                    .values(amount=new_amount)
+                )
+
+                await session.execute(query)
+            
+            await session.commit()
