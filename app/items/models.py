@@ -1,7 +1,7 @@
-from sqlalchemy import Column, Integer, Table, Text, ForeignKey, Numeric
+from sqlalchemy import Column, ForeignKey, Integer, Numeric, Table, Text
 from sqlalchemy.orm import relationship
-from app.database import Base
 
+from app.database import Base
 
 item_shares = Table(
     "item_shares",

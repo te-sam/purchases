@@ -1,12 +1,11 @@
-from httpx import ASGITransport, AsyncClient
 import pytest
-
-from app.main import app as fastapi_app
+from httpx import ASGITransport, AsyncClient
 
 from app.exceptions import NoDataProvidedForUpdate, UserNotFound
+from app.main import app as fastapi_app
 
 
-async def test_get_users(ac: AsyncClient):
+async def test_read_all_users(ac: AsyncClient):
     response = await ac.get("/users")
     assert response.status_code == 200
     json_response = response.json()
@@ -42,7 +41,7 @@ async def test_register_user(ac: AsyncClient, user_data, expected_status):
     ({"email": "test@test.com", "password": "wrongpassword"}, 401),      # Неверный пароль
     ({"email": "wrong@example.com", "password": "securepassword123"}, 401), # Неверный email
 ])
-async def test_login(ac: AsyncClient, login_data, expected_status):
+async def test_login_user(ac: AsyncClient, login_data, expected_status):
     response = await ac.post("/auth/login", json=login_data)
     assert response.status_code == expected_status
 
@@ -52,7 +51,7 @@ async def test_login(ac: AsyncClient, login_data, expected_status):
         # assert json_response["access_token"] == "bearer"
 
 
-async def test_logout(ac: AsyncClient):
+async def test_logout_user(ac: AsyncClient):
     # Устанавливаем куку перед выходом (симуляция залогиненного состояния)
     ac.cookies.set("purchases_access_token", "test_token")
     assert ac.cookies.get("purchases_access_token") == "test_token"

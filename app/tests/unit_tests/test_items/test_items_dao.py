@@ -1,11 +1,13 @@
 from decimal import Decimal
+
 import pytest
 from sqlalchemy import select
+
+from app.database import async_session_maker
 from app.exceptions import CustomerNotInPurchaseError
 from app.items.dao import ItemDAO
 from app.items.models import Items, item_shares
 from app.items.schemas import ItemCreate
-from app.database import async_session_maker
 from app.purchases.models import Purchases
 
 
@@ -86,7 +88,3 @@ async def test_add_items_to_purchase(
             query = select(Purchases.total_amount).where(Purchases.id == purchase_id)
             sum_after = (await session.execute(query)).scalars().first()
             assert sum_after - sum_before == sum_purchase
-
-
-async def test():
-    assert 1==1

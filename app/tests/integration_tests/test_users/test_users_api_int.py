@@ -1,8 +1,9 @@
-from httpx import ASGITransport, AsyncClient
 import pytest
+from httpx import ASGITransport, AsyncClient
 
-from app.main import app as fastapi_app
 from app.exceptions import TokenAbsentException, UserNotFound
+from app.main import app as fastapi_app
+
 
 @pytest.mark.parametrize("user_id", [5])
 async def test_delete_and_get_users(ac: AsyncClient, user_id: int):

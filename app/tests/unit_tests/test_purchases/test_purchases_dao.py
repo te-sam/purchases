@@ -1,12 +1,14 @@
 from decimal import Decimal
+
 import pytest
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+
+from app.database import async_session_maker
 from app.exceptions import AccessDeniedError, PurchaseNotFoundError
 from app.purchases.dao import PurchaseDAO
 from app.purchases.models import Purchases
 from app.purchases.schemas import PurchaseCreate
-from app.database import async_session_maker
 
 
 async def test_add_purchase():

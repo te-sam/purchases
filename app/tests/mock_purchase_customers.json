@@ -38,5 +38,17 @@
     {
         "purchase_id": 7,
         "customer_id": 10
+    },
+    {
+        "purchase_id": 10,
+        "customer_id": 3
+    },
+    {
+        "purchase_id": 10,
+        "customer_id": 9
+    },
+    {
+        "purchase_id": 10,
+        "customer_id": 10
     }
 ]

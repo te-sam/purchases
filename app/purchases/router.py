@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends
-from app.exceptions import AccessDeniedError, NoDataProvidedForUpdate, PurchaseNotAddedError, PurchaseNotFoundError, PurchaseNotUpdatedError, UserNotFound
-from app.purchases.dao import PurchaseDAO
 
+from app.exceptions import (AccessDeniedError, NoDataProvidedForUpdate,
+                            PurchaseNotAddedError, PurchaseNotFoundError,
+                            PurchaseNotUpdatedError, UserNotFound)
+from app.purchases.dao import PurchaseDAO
 from app.purchases.schemas import PurchaseCreate, PurchaseUpdate
 from app.users.dependencies import get_current_user
 from app.users.models import Users

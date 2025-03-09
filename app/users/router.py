@@ -1,11 +1,13 @@
-from fastapi import APIRouter, HTTPException, Response, Depends
-from app.exceptions import CannotAddDataToDatabase, NoDataProvidedForUpdate, UserNotFound
-from app.users.auth import authenticate_user, create_access_token, get_password_hash
+from fastapi import APIRouter, Depends, HTTPException, Response
 
+from app.exceptions import (CannotAddDataToDatabase, NoDataProvidedForUpdate,
+                            UserNotFound)
+from app.users.auth import (authenticate_user, create_access_token,
+                            get_password_hash)
 from app.users.dao import UserDAO
 from app.users.dependencies import get_current_user
-from app.users.schemas import SUserAuth, SUserRegister, UserUpdate
 from app.users.models import Users
+from app.users.schemas import SUserAuth, SUserRegister, UserUpdate
 
 router_auth = APIRouter(
     prefix="/auth",

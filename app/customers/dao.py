@@ -1,12 +1,15 @@
 from sqlalchemy import delete, func, insert, select, update
+
 from app.customers.models import Customers
+from app.customers.schemas import CustomerCreate
 from app.dao.base import BaseDAO
 from app.database import async_session_maker
-from app.customers.schemas import CustomerCreate
-from app.customers.models import Customers
-from app.exceptions import AccessDeniedCustomersError, CustomerNotFound, CustomerNotInPurchaseError, DuplicateRecordError, NoCustomersInPurchaseError
-from app.purchases.models import Purchases, purchase_customers
+from app.exceptions import (AccessDeniedCustomersError, CustomerNotFound,
+                            CustomerNotInPurchaseError, DuplicateRecordError,
+                            NoCustomersInPurchaseError)
 from app.items.models import Items, item_shares
+from app.purchases.models import Purchases, purchase_customers
+
 
 class CustomerDAO(BaseDAO):
     model = Customers
@@ -175,7 +178,7 @@ class CustomerDAO(BaseDAO):
             result = await session.execute(query)
             item_ids = result.scalars().all()
 
-            # Удлаить все записи item_shares для покупателя, который не участвует в покупке
+            # Удлаить все записи item_shares для покупателя, который больше не участвует в покупке
             if item_ids:
                 query = delete(item_shares).where(item_shares.c.item_id.in_(item_ids), item_shares.c.customer_id == customer_id)
                 await session.execute(query)
@@ -209,4 +212,4 @@ class CustomerDAO(BaseDAO):
             query = delete(purchase_customers).where(purchase_customers.c.customer_id == customer_id, purchase_customers.c.purchase_id == purchase_id)
             await session.execute(query)
             
-            await session.commit()
+            await session.commit() 

@@ -28,5 +28,20 @@
         "purchase_id": 1,
         "name": "Сигареты",
         "price": 322.99
+    },
+    {
+        "purchase_id": 10,
+        "name": "Пельмени",
+        "price": 315.78
+    },
+    {
+        "purchase_id": 10,
+        "name": "Самогон",
+        "price": 100
+    },
+    {
+        "purchase_id": 10,
+        "name": "Майонез",
+        "price": 85.34
     }
 ]

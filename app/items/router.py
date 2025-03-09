@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends
+
 from app.exceptions import ItemsNotAddedError
 from app.items.dao import ItemDAO
-
 from app.items.schemas import ItemsList
 from app.users.dependencies import get_current_user
 from app.users.models import Users
-
 
 router_items = APIRouter(
     prefix="/items",

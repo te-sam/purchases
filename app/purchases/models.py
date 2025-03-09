@@ -1,7 +1,8 @@
-from sqlalchemy import CheckConstraint, Column, Integer, Numeric, Table, Text, ForeignKey, TIMESTAMP, UniqueConstraint, func
+from sqlalchemy import (TIMESTAMP, CheckConstraint, Column, ForeignKey,
+                        Integer, Numeric, Table, Text, UniqueConstraint, func)
 from sqlalchemy.orm import relationship
-from app.database import Base
 
+from app.database import Base
 
 purchase_customers = Table(
     "purchase_customers",

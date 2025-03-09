@@ -53,5 +53,35 @@
         "customer_id": 6,
         "item_id": 6,
         "amount": 161.5
+    },
+    {
+        "customer_id": 3,
+        "item_id": 7,
+        "amount": 157.89
+    },
+    {
+        "customer_id": 9,
+        "item_id": 7,
+        "amount": 157.89
+    },
+    {
+        "customer_id": 3,
+        "item_id": 8,
+        "amount": 33.33
+    },
+    {
+        "customer_id": 9,
+        "item_id": 8,
+        "amount": 33.33
+    },
+    {
+        "customer_id": 10,
+        "item_id": 8,
+        "amount": 33.33
+    },
+    {
+        "customer_id": 10,
+        "item_id": 9,
+        "amount": 85.34
     }
 ]

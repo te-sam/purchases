@@ -1,6 +1,7 @@
 import pytest
 from httpx import AsyncClient
 
+
 @pytest.mark.parametrize("purchase_id, items, expected_status", [
     (7, [{"name": "Колбаски", "price": 100.9, "shares": [9, 10]}], 201),  # ✅ Успешное добавление
     (999, [{"name": "Пиво", "price": 80.9, "shares": [1]}], 404),  # ❌ Покупка не найдена

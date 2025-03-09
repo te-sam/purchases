@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends
+
 from app.customers.dao import CustomerDAO
 from app.customers.schemas import CustomerCreate, CustomersList
-from app.exceptions import AccessDeniedCustomersError, CustomerNotAddedError, CustomerNotFound, NoCustomersInPurchaseError
+from app.exceptions import (AccessDeniedCustomersError, CustomerNotAddedError,
+                            CustomerNotFound, NoCustomersInPurchaseError)
 from app.users.dependencies import get_current_user
-
 from app.users.models import Users
-
 
 router_customers = APIRouter(
     prefix="/customers",

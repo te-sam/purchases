@@ -1,12 +1,17 @@
 from decimal import Decimal
+
 import pytest
-from sqlalchemy import select
+from sqlalchemy import func, select
+
 from app.customers.dao import CustomerDAO
 from app.customers.models import Customers
 from app.customers.schemas import CustomerCreate
 from app.database import async_session_maker
-from app.exceptions import AccessDeniedCustomersError, CustomerNotFound, CustomerNotInPurchaseError, DuplicateRecordError, PurchaseNotFoundError
-from app.purchases.dao import purchase_customers
+from app.exceptions import (AccessDeniedCustomersError, AccessDeniedError,
+                            CustomerNotFound, CustomerNotInPurchaseError,
+                            DuplicateRecordError, PurchaseNotFoundError)
+from app.items.models import Items, item_shares
+from app.purchases.models import purchase_customers
 
 
 @pytest.mark.parametrize(
@@ -124,3 +129,92 @@ async def test_get_customers_share(purchase_id, customer_id, user_id, expected_r
         result = await CustomerDAO.get_customers_share(purchase_id, customer_id, user_id)
         
         assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "customer_id, purchase_id, user_id, expected_exception",
+    [
+        (3, 10, 1, None),  # Успешное удаление Гоши из пельменного пати
+        (999, 2, 1, CustomerNotFound),  # Покупатель не существует
+        (5, 2, 1, CustomerNotInPurchaseError),  # Покупатель не участвует в покупке
+        (1, 999, 1, PurchaseNotFoundError),  # Покупка не найдена
+        (1, 2, 2, AccessDeniedError),  # Покупка не принадлежит пользователю
+    ],
+)
+async def test_delete_customer_from_purchase(
+    customer_id: int,
+    purchase_id: int,
+    user_id: int,
+    expected_exception: Exception | None,
+):
+    if expected_exception:
+        # Ожидаем исключение
+        with pytest.raises(expected_exception):
+            await CustomerDAO.delete_customer_from_purchase(
+                customer_id=customer_id,
+                purchase_id=purchase_id,
+                user_id=user_id,
+            )
+    else:
+        # Успешное удаление
+        await CustomerDAO.delete_customer_from_purchase(
+            customer_id=customer_id,
+            purchase_id=purchase_id,
+            user_id=user_id,
+        )
+
+        # Проверяем, что покупатель удален из purchase_customers
+        async with async_session_maker() as session:
+            query = select(purchase_customers).where(
+                purchase_customers.c.customer_id == customer_id,
+                purchase_customers.c.purchase_id == purchase_id,
+            )
+            result = await session.execute(query)
+            assert not result.scalars().first()
+
+            # Проверяем, что записи в item_shares удалены
+            query = select(item_shares).where(
+                item_shares.c.customer_id == customer_id,
+                item_shares.c.item_id.in_(
+                    select(Items.id)
+                    .join(item_shares, Items.id == item_shares.c.item_id)
+                    .where(
+                        (Items.purchase_id == purchase_id) &
+                        (item_shares.c.customer_id == customer_id)
+                    )
+                )
+            )
+            result = await session.execute(query)
+            assert not result.scalars().first()
+
+            # Проверяем, что amount пересчитан для оставшихся покупателей
+            query = select(item_shares).where(
+                item_shares.c.item_id.in_(
+                    select(Items.id)
+                    .join(item_shares, Items.id == item_shares.c.item_id)
+                    .where(Items.purchase_id == purchase_id)
+                )
+            )
+            result = await session.execute(query)
+            result = (result.mappings().all())
+            print(result)
+            for row in result:
+                # Получаем количество покупателей для товара
+                customer_count_query = select(func.count(item_shares.c.customer_id)).where(
+                    item_shares.c.item_id == row.item_id
+                )
+                customer_count = (await session.execute(customer_count_query)).scalar()
+
+                # Получаем цену товара
+                item_price_query = select(Items.price).where(Items.id == row.item_id)
+                item_price = (await session.execute(item_price_query)).scalar()
+
+                # Рассчитываем ожидаемое значение amount
+                expected_amount = item_price / customer_count
+                print(expected_amount)
+
+                # Проверяем, что amount обновлен
+                assert row.amount == expected_amount
+
+async def test():
+    assert 1 == 1

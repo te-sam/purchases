@@ -1,9 +1,10 @@
 from sqlalchemy import delete, insert, select
+
 from app.dao.base import BaseDAO
+from app.database import async_session_maker
 from app.exceptions import CustomerNotInPurchaseError, ItemsNotFound
 from app.items.models import Items, item_shares
 from app.items.schemas import ItemCreate
-from app.database import async_session_maker
 from app.purchases.dao import PurchaseDAO
 from app.purchases.models import purchase_customers
 
