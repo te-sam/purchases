@@ -1,8 +1,0 @@
-.pytest_cache/
-__pycache__/
-venv/
-.env
-old/
-bd_receipts.txt
-htmlcov/
-.coverage
