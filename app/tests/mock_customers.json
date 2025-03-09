@@ -48,5 +48,10 @@
         "email": "black@yandex.ru",
         "name": "Махагон",
         "created_by": 1
+    },
+    {
+        "email": "delete@yandex.ru",
+        "name": "Удалим через api",
+        "created_by": 1
     }
 ]

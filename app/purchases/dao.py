@@ -48,6 +48,7 @@ class PurchaseDAO(BaseDAO):
                 select(
                     Purchases.id,
                     Purchases.name.label("purchase_name"),
+                    Purchases.total_amount,
                     func.array_agg(distinct(purchase_customers.c.customer_id)).label("customer_ids"),
                     func.array_agg(
                         func.jsonb_build_object(

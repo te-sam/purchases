@@ -43,5 +43,45 @@
         "purchase_id": 10,
         "name": "Майонез",
         "price": 85.34
+    },
+    {
+        "purchase_id": 11,
+        "name": "Коктейль",
+        "price": 215.22
+    },
+    {
+        "purchase_id": 11,
+        "name": "Доширак",
+        "price": 68
+    },
+    {
+        "purchase_id": 11,
+        "name": "Балтика 9",
+        "price": 318.56
+    },
+    {
+        "purchase_id": 11,
+        "name": "Сыр косичка",
+        "price": 252
+    },
+    {
+        "purchase_id": 15,
+        "name": "Креветки",
+        "price": 1100
+    },
+    {
+        "purchase_id": 15,
+        "name": "Палтус",
+        "price": 528.29
+    },
+    {
+        "purchase_id": 16,
+        "name": "Огурец",
+        "price": 78.15
+    },
+    {
+        "purchase_id": 16,
+        "name": "Помидор",
+        "price": 32.58
     }
 ]

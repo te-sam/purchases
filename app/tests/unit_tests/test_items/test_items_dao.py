@@ -1,10 +1,10 @@
 from decimal import Decimal
 
 import pytest
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app.database import async_session_maker
-from app.exceptions import CustomerNotInPurchaseError
+from app.exceptions import AccessDeniedError, CustomerNotInPurchaseError, ItemsNotFound, PurchaseNotFoundError
 from app.items.dao import ItemDAO
 from app.items.models import Items, item_shares
 from app.items.schemas import ItemCreate
@@ -88,3 +88,55 @@ async def test_add_items_to_purchase(
             query = select(Purchases.total_amount).where(Purchases.id == purchase_id)
             sum_after = (await session.execute(query)).scalars().first()
             assert sum_after - sum_before == sum_purchase
+
+
+@pytest.mark.parametrize(
+    "item_id, purchase_id, user_id, expected_exception",
+    [
+        (10, 11, 3, None), # Успешное удаление
+        (1, 999, 1, PurchaseNotFoundError),  # Покупка не найдена
+        (1, 1, 999, AccessDeniedError),  # Нет доступа к покупке
+        (999, 2, 1, ItemsNotFound),  # Товар не найден
+    ],
+)
+async def test_delete_item_from_purchase(
+    item_id: int,
+    purchase_id: int,
+    user_id: int,
+    expected_exception: Exception | None
+):
+    if expected_exception:
+        with pytest.raises(expected_exception):
+            await ItemDAO.delete_item_from_purchase(
+                item_id=item_id,
+                purchase_id=purchase_id,
+                user_id=user_id,
+            )
+    else:
+        # Успешное удаление
+        await ItemDAO.delete_item_from_purchase(
+            item_id=item_id,
+            purchase_id=purchase_id,
+            user_id=user_id,
+        )
+
+        # Проверяем, что товар удален
+        async with async_session_maker() as session:
+            query = select(Items).where(Items.id == item_id)
+            result = await session.execute(query)
+            assert not result.scalars().first()
+
+            # Проверяем, что записи в item_shares удалены
+            query = select(item_shares).where(item_shares.c.item_id == item_id)
+            result = await session.execute(query)
+            assert not result.scalars().first()
+
+            # Проверяем, что total_amount обновлен
+            query = select(Purchases.total_amount).where(Purchases.id == purchase_id)
+            result = await session.execute(query)
+            expected_total_amount = result.scalar()
+
+            query = select(func.sum(Items.price)).where(Items.purchase_id == purchase_id)
+            result = await session.execute(query)
+            total_amount = result.scalar()
+            assert total_amount == expected_total_amount # Проверяем, что total_amount равен сумме цен товаров в покупке

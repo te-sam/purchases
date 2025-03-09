@@ -45,3 +45,29 @@ async def test_get_purchase_by_id(authenticated_ac: AsyncClient, purchase_id, ex
 async def test_delete_purchase_by_id(authenticated_ac: AsyncClient, purchase_id: int, expected_status: int):
     response = await authenticated_ac.delete(f"/purchases/{purchase_id}")
     assert response.status_code == expected_status
+
+
+@pytest.mark.parametrize(
+    "purchase_id, update_data, expected_status",
+    [
+        
+        (12, {"name": "Посиделки на завалинке"}, 200),  # Успешное обновление одного поля
+        (999, {"name": "Updated Purchase"}, 404),  # Покупка не найдена
+        (1, {"name": "Updated Purchase"}, 403),  # Нет доступа к покупке
+        (2, {}, 422),  # Нет данных для обновления
+    ],
+)
+async def test_update_purchases_by_id(
+    authenticated_ac: AsyncClient,
+    purchase_id: int,
+    update_data: dict,
+    expected_status: int,
+):
+    response = await authenticated_ac.patch(f"/purchases/{purchase_id}", json=update_data)
+    print(response.json())
+    assert response.status_code == expected_status
+
+    # Проверяем тело ответа
+    if expected_status == 200:
+        updated_purchase = response.json()
+        assert updated_purchase["name"] == update_data["name"]

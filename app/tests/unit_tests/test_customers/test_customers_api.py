@@ -92,3 +92,42 @@ async def test_get_customers_share(authenticated_ac: AsyncClient, purchase_id, c
 
     assert response.status_code == expected_status
     assert response.json() == expected_response
+
+
+@pytest.mark.parametrize(
+    "customer_id, expected_status",
+    [
+        (11, 204),  # Успешное удаление
+        (999, 404),  # Покупатель не найден
+        (5, 403),  # Нет доступа к покупателю
+    ],
+)
+async def test_delete_customer(authenticated_ac: AsyncClient, customer_id: int, expected_status: int):
+    response = await authenticated_ac.delete(f"customers/{customer_id}")
+    assert response.status_code == expected_status
+
+
+async def test_get_customers(ac: AsyncClient):
+    response = await ac.get("/customers")
+    assert response.status_code == 200
+    assert len(response.json()) > 0
+
+
+@pytest.mark.parametrize(
+    "purchase_id, customer_id, expected_status",
+    [
+        (12, 10, 204),  # Успешное удаление
+        (2, 999, 404),  # Покупатель не найден
+        (999, 1, 404),  # Покупка не найдена
+        (2, 9, 404),  # Покупатель не участвует в покупке
+        (1, 1, 403),  # Нет доступа к покупке
+    ],
+)
+async def test_delete_customer_from_purchase(
+    authenticated_ac: AsyncClient,
+    purchase_id: int,
+    customer_id: int,
+    expected_status: int,
+):
+    response = await authenticated_ac.delete(f"/customers/{purchase_id}/{customer_id}")
+    assert response.status_code == expected_status

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from app.exceptions import ItemsNotAddedError
+from app.exceptions import ItemsNotAddedError, ItemsNotFound
 from app.items.dao import ItemDAO
 from app.items.schemas import ItemsList
 from app.users.dependencies import get_current_user
@@ -24,3 +24,11 @@ async def add_items_to_purchase(purchase_id: int, items_list: ItemsList, user: U
 @router_items.delete("/{purchase_id}/{item_id}", status_code=204)
 async def delete_item_from_purchase(item_id: int, purchase_id: int, user: Users = Depends(get_current_user)):
     await ItemDAO.delete_item_from_purchase(item_id=item_id, purchase_id=purchase_id, user_id=user.id)
+
+
+@router_items.get("/{item_id}", status_code=200)
+async def get_item_by_id(item_id: int, user: Users = Depends(get_current_user)):
+    item = await ItemDAO.get_item_by_id(item_id=item_id, user_id=user.id)
+    if not item:
+        raise ItemsNotFound
+    return item

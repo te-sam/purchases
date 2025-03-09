@@ -2,11 +2,11 @@ from sqlalchemy import delete, insert, select
 
 from app.dao.base import BaseDAO
 from app.database import async_session_maker
-from app.exceptions import CustomerNotInPurchaseError, ItemsNotFound
+from app.exceptions import AccessDeniedError, CustomerNotInPurchaseError, ItemsNotFound
 from app.items.models import Items, item_shares
 from app.items.schemas import ItemCreate
 from app.purchases.dao import PurchaseDAO
-from app.purchases.models import purchase_customers
+from app.purchases.models import Purchases, purchase_customers
 
 
 class ItemDAO(BaseDAO):
@@ -92,3 +92,30 @@ class ItemDAO(BaseDAO):
             await session.execute(query)
 
             await session.commit()
+    
+    @classmethod
+    async def get_item_by_id(cls, item_id: int, user_id: int):
+        async with async_session_maker() as session:
+            # Проерка, что item существует
+            query = select(Items.id).where(Items.id == item_id)
+            result = await session.execute(query)
+            if not result.mappings().first():
+                raise ItemsNotFound
+            
+            # Проверка, что Items принадлежит покупке, которая принадлежит пользователю
+            """
+            SELECT purchases.created_by 
+            FROM purchases
+            JOIN items ON items.purchase_id = purchases.id 
+            WHERE items.id = 7
+            """
+            query = select(Purchases.created_by).join(Items, Purchases.id == Items.purchase_id).where(Items.id == item_id)
+            result = await session.execute(query)
+            created_by = result.scalars().first()
+            if created_by != user_id:
+                raise AccessDeniedError
+            
+            # Возвращаем item
+            query = select(Items.id, Items.name, Items.price, Items.purchase_id).where(Items.id == item_id)
+            result = await session.execute(query)
+            return result.mappings().one_or_none()

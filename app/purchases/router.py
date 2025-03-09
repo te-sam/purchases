@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.exceptions import (AccessDeniedError, NoDataProvidedForUpdate,
                             PurchaseNotAddedError, PurchaseNotFoundError,
@@ -50,21 +50,16 @@ async def update_purchases_by_id(
     purchase_id: int,
     update_data: PurchaseUpdate,
     current_user: Users = Depends(get_current_user),
-):  
+): 
     purchase = await PurchaseDAO.find_one_or_none(id=purchase_id)
     if not purchase:
         raise PurchaseNotFoundError
     if purchase.created_by != current_user.id:
         raise AccessDeniedError
-    # Обновляем только те поля, которые переданы в запросе
-    update_dict = update_data.model_dump(exclude_unset=True)  # Исключаем поля со значением None
-    if not update_dict:
-        raise NoDataProvidedForUpdate
     
     # Обновляем данные пользователя в базе данных
-    updated_purchase = await PurchaseDAO.update(purchase_id, created_by=current_user.id, **update_dict)
+    updated_purchase = await PurchaseDAO.update(purchase_id, created_by=current_user.id, **dict(update_data))
     if not updated_purchase:
         raise PurchaseNotUpdatedError
-
     return updated_purchase
 

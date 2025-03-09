@@ -50,5 +50,9 @@
     {
         "purchase_id": 10,
         "customer_id": 10
+    },
+    {
+        "purchase_id": 12,
+        "customer_id": 10
     }
 ]

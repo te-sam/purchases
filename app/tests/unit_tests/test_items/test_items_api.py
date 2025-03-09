@@ -10,7 +10,6 @@ from httpx import AsyncClient
     (7, None, 422),  # ❌ Некорректные данные (отправили `None`)
     (1,  [{"name": "Чипсы", "price": 50, "shares": [999]}], 403),  # ❌ Покупка не принадлежит пользователю
 ])
-@pytest.mark.asyncio
 async def test_add_items_to_purchase(authenticated_ac: AsyncClient, request, purchase_id, items, expected_status):
     response = await authenticated_ac.post(f"/items/{purchase_id}", json={"items": items})
     assert response.status_code == expected_status
@@ -20,3 +19,14 @@ async def test_add_items_to_purchase(authenticated_ac: AsyncClient, request, pur
         json_response = response.json()
         assert isinstance(json_response, list)
         assert all("name" in item and "price" in item and "id" in item for item in json_response)
+
+
+@pytest.mark.parametrize("purchase_id, item_id, expected_status", [
+    (16, 17, 204),  # ✅ Успешное удаление
+    (1, 2, 403),  # ❌ Покупка не принадлежит пользователю
+    (999, 1, 404),  # ❌ Покупка не найдена
+    (2, 999, 404),  # ❌ item не найден
+])
+async def test_delete_item_from_purchase(authenticated_ac: AsyncClient, purchase_id: int, item_id: int, expected_status):
+    response = await authenticated_ac.delete(f"items/{purchase_id}/{item_id}")
+    assert response.status_code == expected_status

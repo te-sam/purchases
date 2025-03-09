@@ -153,7 +153,7 @@ class CustomerDAO(BaseDAO):
         async with async_session_maker() as session:
             await cls.check_purchase(purchase_id, user_id, session)
 
-            # Проверка, что пользователь существует
+            # Проверка, что покупатель существует
             query = select(Customers.name).where(Customers.id == customer_id)
             result = await session.execute(query)
             customer = result.scalars().first()
