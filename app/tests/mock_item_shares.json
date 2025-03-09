@@ -1,0 +1,87 @@
+[
+    {
+        "customer_id": 1,
+        "item_id": 1,
+        "amount": 193.33
+    },
+    {
+        "customer_id": 2,
+        "item_id": 1,
+        "amount": 193.33
+    },
+    {
+        "customer_id": 3,
+        "item_id": 1,
+        "amount": 193.33
+    },
+    {
+        "customer_id": 2,
+        "item_id": 2,
+        "amount": 675.26
+    },
+    {
+        "customer_id": 3,
+        "item_id": 2,
+        "amount": 675.26
+    },
+    {
+        "customer_id": 2,
+        "item_id": 3,
+        "amount": 280.99
+    },
+    {
+        "customer_id": 5,
+        "item_id": 4,
+        "amount": 357
+    },
+    {
+        "customer_id": 5,
+        "item_id": 5,
+        "amount": 57.62
+    },
+    {
+        "customer_id": 6,
+        "item_id": 5,
+        "amount": 57.62
+    },
+    {
+        "customer_id": 5,
+        "item_id": 6,
+        "amount": 161.5
+    },
+    {
+        "customer_id": 6,
+        "item_id": 6,
+        "amount": 161.5
+    },
+    {
+        "customer_id": 3,
+        "item_id": 7,
+        "amount": 157.89
+    },
+    {
+        "customer_id": 9,
+        "item_id": 7,
+        "amount": 157.89
+    },
+    {
+        "customer_id": 3,
+        "item_id": 8,
+        "amount": 33.33
+    },
+    {
+        "customer_id": 9,
+        "item_id": 8,
+        "amount": 33.33
+    },
+    {
+        "customer_id": 10,
+        "item_id": 8,
+        "amount": 33.33
+    },
+    {
+        "customer_id": 10,
+        "item_id": 9,
+        "amount": 85.34
+    }
+]

@@ -1,0 +1,47 @@
+[
+    {
+        "purchase_id": 2,
+        "name": "Пиво",
+        "price": 580
+    },
+    {
+        "purchase_id": 2,
+        "name": "Шашлык",
+        "price": 1350.52
+    },
+    {
+        "purchase_id": 2,
+        "name": "Апельсиновый сок",
+        "price": 280.99
+    },
+    {
+        "purchase_id": 1,
+        "name": "Водка",
+        "price": 357
+    },
+    {
+        "purchase_id": 1,
+        "name": "Сухарики",
+        "price": 115.23
+    },
+    {
+        "purchase_id": 1,
+        "name": "Сигареты",
+        "price": 322.99
+    },
+    {
+        "purchase_id": 10,
+        "name": "Пельмени",
+        "price": 315.78
+    },
+    {
+        "purchase_id": 10,
+        "name": "Самогон",
+        "price": 100
+    },
+    {
+        "purchase_id": 10,
+        "name": "Майонез",
+        "price": 85.34
+    }
+]
